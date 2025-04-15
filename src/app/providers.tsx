@@ -39,6 +39,8 @@ export function Providers(props: {
           config={{
             paymasterContext: {
               mode: "SPONSORED",
+              calculateGasLimits: true,
+              expiryDuration: 300,
               policyId: process.env.NEXT_PUBLIC_ALCHEMY_POLICY_ID as string,
             },
           }}

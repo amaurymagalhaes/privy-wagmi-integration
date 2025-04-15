@@ -12,6 +12,7 @@ import { useState } from "react";
 import { parseEther } from "viem";
 import { arbitrum } from "viem/chains";
 import { useDisconnectAndLogout } from "@/hook/useDisconnectAndLogout";
+import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 
 // Define types for wallet objects
 interface WalletAccount {
@@ -25,19 +26,28 @@ function App() {
   const { address } = useAccount();
   const { data: balance } = useBalance({ address });
   const [txStatus, setTxStatus] = useState("");
+  const { client } = useSmartWallets();
 
   const { sendTransactionAsync } = useSendTransaction();
 
   const handleSendETH = async () => {
-    if (!address) return;
+    if (!address || !client) return;
 
     try {
       setTxStatus("Sending transaction...");
-      const txHash = await sendTransactionAsync({
-        to: "0xf37380c57881EeFcf503FBbf7670895A5b6c4421",
-        value: parseEther("0.0001"),
-        chainId: arbitrum.id,
-      });
+      const uiOptions = {
+        title: "Sample title text",
+        description: "Sample description text",
+        buttonText: "Sample button text",
+      };
+      const txHash = await client.sendTransaction(
+        {
+          to: "0xf37380c57881EeFcf503FBbf7670895A5b6c4421",
+          value: parseEther("0.00001"),
+          chain: arbitrum,
+        },
+        { uiOptions }
+      );
       setTxStatus(`Transaction sent! Hash: ${txHash}`);
     } catch (error) {
       setTxStatus(`Error: ${(error as Error).message}`);
